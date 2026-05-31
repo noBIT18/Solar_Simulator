@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://elst0xn32iil"]
+
+[ext_resource type="Script" uid="uid://cjs05xvglllsw" path="res://background.gd" id="1_80nbo"]
+[ext_resource type="PackedScene" uid="uid://b5vmel01rfdoi" path="res://star.tscn" id="2_e2o6t"]
+[ext_resource type="Script" uid="uid://tm3tng57twac" path="res://UI.gd" id="3_feb5d"]
+
+[sub_resource type="Environment" id="Environment_feb5d"]
+glow_enabled = true
+glow_bloom = 1.0
+glow_blend_mode = 2
+
+[node name="Node2D" type="Node2D" unique_id=1450206000]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=232811967]
+environment = SubResource("Environment_feb5d")
+
+[node name="Background" type="Node2D" parent="." unique_id=1179315897]
+visible = false
+script = ExtResource("1_80nbo")
+
+[node name="Star" parent="." unique_id=2061733008 instance=ExtResource("2_e2o6t")]
+mass = 1
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1183981969]
+
+[node name="Camera2D" type="Camera2D" parent="CanvasLayer" unique_id=1555658140]
+
+[node name="Control" type="Control" parent="CanvasLayer" unique_id=1608423503]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("3_feb5d")
+
+[node name="Button" type="Button" parent="CanvasLayer/Control" unique_id=1753759581]
+layout_mode = 0
+offset_right = 779.0
+offset_bottom = 73.0
+text = "REROLL"
+
+[connection signal="pressed" from="CanvasLayer/Control/Button" to="CanvasLayer/Control" method="_on_button_pressed"]
