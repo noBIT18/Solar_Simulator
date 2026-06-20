@@ -13,7 +13,6 @@ const STAR_TYPES = [
 	{"class": "M", "color": Color(1.0, 0.35, 0.15), "base_radius": 25.0}
 ]
 
-# This list will hold all of our generated planet data
 var planets: Array = []
 var star_radius: float = 50.0
 
@@ -24,7 +23,6 @@ func reroll():
 	planets.clear()
 	temperature = randi_range(1, 10)
 	
-	# Calculate star radius first so planets know where they can safely start orbiting
 	var star_type_index = get_star_type_index()
 	var base_radius = STAR_TYPES[star_type_index]["base_radius"]
 	star_radius = base_radius * pow(float(mass), 0.8)
@@ -33,27 +31,20 @@ func reroll():
 	queue_redraw()
 
 func _process(delta: float) -> void:
-	# Loop through our list and advance every planet's orbital angle over time
 	for planet in planets:
 		planet["angle"] += planet["speed"] * delta
-		# Keep the angle mathematically bound between 0 and 360 degrees (TAU)
 		planet["angle"] = fmod(planet["angle"], TAU)
 		
-	# Tell Godot to constantly redraw the screen every single frame for the animation
 	queue_redraw()
 
 func generate_planets():
 	var num_planets = randi_range(3, 6)
-	# Start the first orbital lane just past the star's edge
 	var current_distance = star_radius + 60.0 
 	
 	for i in range(num_planets):
-		# Kepler's Third Law: Period squared is proportional to distance cubed
-		# We include float(mass) so heavier stars make planets orbit faster!
 		var orbital_period = sqrt(pow(current_distance, 3) / float(mass))
 		var speed_modifier = 2500.0 / orbital_period
 		
-		# Generate a random planet dictionary
 		var new_planet = {
 			"distance": current_distance,
 			"angle": randf_range(0, TAU),
@@ -64,7 +55,6 @@ func generate_planets():
 		
 		planets.append(new_planet)
 		
-		# Step outward for the next planet lane so they don't collide
 		current_distance += randf_range(70.0, 120.0)
 
 func get_star_type_index() -> int:
@@ -77,29 +67,22 @@ func get_star_type_index() -> int:
 	else: return 6
 
 func _draw() -> void:
-	# --- DRAW STAR ---
 	var star_type_index = get_star_type_index()
 	var star_color = STAR_TYPES[star_type_index]["color"]
 	
-	# Fake glow background layers
 	var glow_color = star_color
 	glow_color.a = 0.12
 	draw_circle(Vector2(0, 0), star_radius * 1.3, glow_color)
 	draw_circle(Vector2(0, 0), star_radius * 1.15, glow_color)
 	
-	# Solid star core
 	draw_circle(Vector2(0, 0), star_radius, star_color)
 	
-	# --- DRAW PLANETS ---
 	for planet in planets:
-		# 1. Draw the faint orbital ring line first so it looks like a space map
 		draw_arc(Vector2(0,0), planet["distance"], 0, TAU, 120, Color(1, 1, 1, 0.07), 1.0)
 		
-		# 2. Convert Polar coordinates (distance, angle) into screen coordinates (X, Y)
 		var planet_pos = Vector2(
 			planet["distance"] * cos(planet["angle"]),
 			planet["distance"] * sin(planet["angle"])
 		)
 		
-		# 3. Draw the planet circle at its calculated position
 		draw_circle(planet_pos, planet["radius"], planet["color"])
